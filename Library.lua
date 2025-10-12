@@ -22,6 +22,8 @@ local Options = {};
 
 getgenv().Toggles = Toggles;
 getgenv().Options = Options;
+getgenv().MiscUi = {}
+getgenv().MiscUi["Buttons"] = {}
 
 local Library = {
     Registry = {};
