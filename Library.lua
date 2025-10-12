@@ -2148,6 +2148,496 @@ do
         return Slider;
     end;
 
+	function Funcs:AddyLordDropdown(Idx, Info)
+
+			if Info.SpecialType == 'Player' then
+				Info.Values = GetPlayersString();
+			elseif Info.SpecialType == 'Team' then
+				Info.Values = GetTeamsString();
+			end;
+
+			local Dropdown = {
+				Values = Info.Values;
+				Value = Info.Multi and {};
+				Multi = Info.Multi;
+				Type = 'Dropdown';
+				SpecialType = Info.SpecialType; -- can be either 'Player' or 'Team'
+				Callback = Info.Callback or function(Value) end;
+			};
+
+			local Groupbox = self;
+			local Container = Groupbox.Container;
+
+			local RelativeOffset = 0;
+
+			if not Info.Compact then
+				local DropdownLabel = Library:CreateLabel({
+					Size = UDim2.new(1, 0, 0, 10);
+					TextSize = 14;
+					Text = "Pokemon WishList";
+					TextXAlignment = Enum.TextXAlignment.Left;
+					TextYAlignment = Enum.TextYAlignment.Bottom;
+					ZIndex = 5;
+					Parent = Container;
+				});
+
+				Groupbox:AddBlank(3);
+			end
+
+			for _, Element in next, Container:GetChildren() do
+				if not Element:IsA('UIListLayout') then
+					RelativeOffset = RelativeOffset + Element.Size.Y.Offset;
+				end;
+			end;
+
+			local DropdownOuter = Library:Create('Frame', {
+				BorderColor3 = Color3.new(0, 0, 0);
+				Size = UDim2.new(1, -4, 0, 20);
+				ZIndex = 5;
+				Parent = Container;
+			});
+
+			Library:AddToRegistry(DropdownOuter, {
+				BorderColor3 = 'Black';
+			});
+
+			local DropdownInner = Library:Create('Frame', {
+				BackgroundColor3 = Library.MainColor;
+				BorderColor3 = Library.OutlineColor;
+				BorderMode = Enum.BorderMode.Inset;
+				Size = UDim2.new(1, 0, 1, 0);
+				ZIndex = 6;
+				Parent = DropdownOuter;
+			});
+
+			Library:AddToRegistry(DropdownInner, {
+				BackgroundColor3 = 'MainColor';
+				BorderColor3 = 'OutlineColor';
+			});
+
+			Library:Create('UIGradient', {
+				Color = ColorSequence.new({
+					ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
+					ColorSequenceKeypoint.new(1, Color3.fromRGB(212, 212, 212))
+				});
+				Rotation = 90;
+				Parent = DropdownInner;
+			});
+
+			local DropdownArrow = Library:Create('ImageLabel', {
+				AnchorPoint = Vector2.new(0, 0.5);
+				BackgroundTransparency = 1;
+				Position = UDim2.new(1, -16, 0.5, 0);
+				Size = UDim2.new(0, 12, 0, 12);
+				Image = 'http://www.roblox.com/asset/?id=6282522798';
+				ZIndex = 8;
+				Parent = DropdownInner;
+			});
+
+			local ItemList = Library:CreateLabel({
+				Position = UDim2.new(0, 5, 0, 0);
+				Size = UDim2.new(1, -5, 1, 0);
+				TextSize = 14;
+				Text = 'Pokemons';
+				TextXAlignment = Enum.TextXAlignment.Left;
+				TextWrapped = true;
+				ZIndex = 7;
+				Parent = DropdownInner;
+			});
+
+			Library:OnHighlight(DropdownOuter, DropdownOuter,
+				{ BorderColor3 = 'AccentColor' },
+				{ BorderColor3 = 'Black' }
+			);
+
+			if type(Info.Tooltip) == 'string' then
+				Library:AddToolTip(Info.Tooltip, DropdownOuter)
+			end
+
+			local MAX_DROPDOWN_ITEMS = 8;
+
+			local ListOuter = Library:Create('Frame', {
+				BorderColor3 = Color3.new(0, 0, 0);
+				Position = UDim2.new(0, 4, 0, 20 + RelativeOffset + 1 + 20);
+				Size = UDim2.new(1, -8, 0, MAX_DROPDOWN_ITEMS * 20 + 2);
+				ZIndex = 20;
+				Visible = false;
+				Parent = Container.Parent;
+			});
+
+			local ListInner = Library:Create('Frame', {
+				BackgroundColor3 = Library.MainColor;
+				BorderColor3 = Library.OutlineColor;
+				BorderMode = Enum.BorderMode.Inset;
+				BorderSizePixel = 0;
+				Size = UDim2.new(1, 0, 1, 0);
+				ZIndex = 21;
+				Parent = ListOuter;
+			});
+
+			Library:AddToRegistry(ListInner, {
+				BackgroundColor3 = 'MainColor';
+				BorderColor3 = 'OutlineColor';
+			});
+
+			local Scrolling = Library:Create('ScrollingFrame', {
+				BackgroundTransparency = 1;
+				CanvasSize = UDim2.new(0, 0, 0, 0);
+				Size = UDim2.new(1, 0, 1, 0);
+				ZIndex = 21;
+				Parent = ListInner;
+
+				TopImage = 'rbxasset://textures/ui/Scroll/scroll-middle.png',
+				BottomImage = 'rbxasset://textures/ui/Scroll/scroll-middle.png',
+
+				ScrollBarThickness = 3,
+				ScrollBarImageColor3 = Library.AccentColor,
+
+			});
+
+			Library:AddToRegistry(Scrolling, {
+				ScrollBarImageColor3 = 'AccentColor'
+			})
+
+			Library:Create('UIListLayout', {
+				Padding = UDim.new(0, 0);
+				FillDirection = Enum.FillDirection.Vertical;
+				SortOrder = Enum.SortOrder.LayoutOrder;
+				Parent = Scrolling;
+			});
+
+			function Dropdown:Display()
+
+			end;
+
+			function Dropdown:GetActiveValues()
+				if Info.Multi then
+					local T = {};
+
+					for Value, Bool in next, Dropdown.Value do
+						table.insert(T, Value);
+					end;
+
+					return T;
+				else
+					return Dropdown.Value and 1 or 0;
+				end;
+			end;
+
+			local Buttons = getgenv().MiscUi["Buttons"]
+
+			function Dropdown:SetValues()
+				local Values = Dropdown.Values;
+
+				for _, Element in next, Scrolling:GetChildren() do
+					if not Element:IsA('UIListLayout') then
+						-- Library:RemoveFromRegistry(Element);
+						Element:Destroy();
+					end;
+				end;
+
+				local Count = 0;
+
+				for Idx, Value in next, getgenv().WishList do
+
+					local Table = {
+						UpdateButton = nil,
+						RealValue = Value,
+					};
+
+					Count = Count + 1;
+
+					TotalButtons = TotalButtons + 1
+
+					local Button = Library:Create('Frame', {
+						BackgroundColor3 = Library.MainColor;
+						BorderColor3 = Library.OutlineColor;
+						BorderMode = Enum.BorderMode.Middle;
+						Size = UDim2.new(1, -1, 0, 20);
+						ZIndex = 23;
+						Active = true,
+						Parent = Scrolling;
+					});
+
+					Library:AddToRegistry(Button, {
+						BackgroundColor3 = 'MainColor';
+						BorderColor3 = 'OutlineColor';
+					});
+
+					local ButtonLabel = Library:CreateLabel({
+						Size = UDim2.new(1, -6, 1, 0);
+						Position = UDim2.new(0, 6, 0, 0);
+						TextSize = 14;
+						Text = Value;
+						TextXAlignment = Enum.TextXAlignment.Left;
+						ZIndex = 25;
+						Parent = Button;
+					});
+
+
+					Library:OnHighlight(Button, Button,
+						{ BorderColor3 = 'AccentColor', ZIndex = 24 },
+						{ BorderColor3 = 'OutlineColor', ZIndex = 23 }
+					);
+
+					local Selected;
+
+					if Info.Multi then
+						Selected = Dropdown.Value[Value];
+					else
+						Selected = Dropdown.Value == Value;
+					end;
+
+
+
+					local Y = math.clamp(Count * 20, 0, MAX_DROPDOWN_ITEMS * 20) + 1;
+					ListOuter.Size = UDim2.new(1, -8, 0, Y);
+					Scrolling.CanvasSize = UDim2.new(0, 0, 0, (Count * 20) + 1);
+
+					Table.UpdateButton = function()
+						if Info.Multi then
+							Selected = Dropdown.Value[Value];
+						else
+							Selected = Dropdown.Value == Value;
+						end;
+
+						-- ButtonLabel.TextColor3 = Selected and Library.AccentColor or Library.FontColor;
+						-- Library.RegistryMap[ButtonLabel].Properties.TextColor3 = Selected and 'AccentColor' or 'FontColor';
+					end;
+
+					Table.ButtonInput =  ButtonLabel.InputBegan:Connect(function(Input)
+						if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+							Options.PokemonNameBox:SetValue(Value)
+							getgenv().PokemonBoxValue = Value
+						end;
+					end);
+
+					Table.UpdateButton();
+					Dropdown:Display();
+
+					Buttons[Button] = Table;
+				end;
+
+
+				-- ListOuter.Size = UDim2.new(1, -8, 0, (#Values * 20) + 2);
+			end;
+
+			getgenv().MiscFunctions["RemoveDropdownValue"] = function ()
+
+				TotalButtons = TotalButtons - 1
+
+				if TotalButtons > 8 then
+
+					Scrolling.CanvasSize = Scrolling.CanvasSize - UDim2.new(0,0,0,20)
+					ListOuter.Size = ListOuter.Size - UDim2.new(0,0,0,0.5);
+
+				elseif TotalButtons <= 8 then
+					Scrolling.CanvasSize = UDim2.new(0,0,0,0)
+					ListOuter.Size = ListOuter.Size - UDim2.new(0,0,0,TotalButtons == 8 and 0.5 or 20);
+				end
+
+
+			end
+
+			getgenv().MiscFunctions["NewDropdownValue"] = function (Idx,Value)
+
+				local Count = 0;
+
+				local Table = {
+					UpdateButton = nil,
+					RealValue = Value,
+				};
+
+				Count = Idx
+				TotalButtons = TotalButtons + 1
+				local Button = Library:Create('Frame', {
+					BackgroundColor3 = Library.MainColor;
+					BorderColor3 = Library.OutlineColor;
+					BorderMode = Enum.BorderMode.Middle;
+					Size = UDim2.new(1, -1, 0, 20);
+					ZIndex = 23;
+					Active = true,
+					Parent = Scrolling;
+				});
+
+				Library:AddToRegistry(Button, {
+					BackgroundColor3 = 'MainColor';
+					BorderColor3 = 'OutlineColor';
+				});
+
+				local ButtonLabel = Library:CreateLabel({
+					Size = UDim2.new(1, -6, 1, 0);
+					Position = UDim2.new(0, 6, 0, 0);
+					TextSize = 14;
+					Text = Value;
+					TextXAlignment = Enum.TextXAlignment.Left;
+					ZIndex = 25;
+					Parent = Button;
+				});
+
+				Library:OnHighlight(Button, Button,
+					{ BorderColor3 = 'AccentColor', ZIndex = 24 },
+					{ BorderColor3 = 'OutlineColor', ZIndex = 23 }
+				);
+
+				local Selected;
+
+				if Info.Multi then
+					Selected = Dropdown.Value[Value];
+				else
+					Selected = Dropdown.Value == Value;
+				end;
+
+				local Y = math.clamp(Count * 20, 0, MAX_DROPDOWN_ITEMS * 20) + 1;
+				ListOuter.Size = UDim2.new(1, -8, 0, Y);
+				Scrolling.CanvasSize = UDim2.new(0, 0, 0, (Count * 20) + 1);
+
+				Table.UpdateButton = function()
+					if Info.Multi then
+						Selected = Dropdown.Value[Value];
+					else
+						Selected = Dropdown.Value == Value;
+					end;
+
+					-- ButtonLabel.TextColor3 = Selected and Library.AccentColor or Library.FontColor;
+					-- Library.RegistryMap[ButtonLabel].Properties.TextColor3 = Selected and 'AccentColor' or 'FontColor';
+				end;
+
+
+
+				Table:UpdateButton();
+				-- Dropdown:Display();
+
+				Table.ButtonInput =  ButtonLabel.InputBegan:Connect(function(Input)
+					if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+						Options.PokemonNameBox:SetValue(Value)
+						getgenv().PokemonBoxValue = Value
+					end;
+				end);
+
+				-- Options.PokemonNameBox:SetValue('Safe')
+
+				Buttons[Button] = Table;
+
+--[[
+            local Y = math.clamp(Count * 20, 0, MAX_DROPDOWN_ITEMS * 20) + 1;
+            ListOuter.Size = UDim2.new(1, -8, 0, Y);
+           Scrolling.CanvasSize = UDim2.new(0, 0, 0, (Count * 20) + 1);
+
+            -- ListOuter.Size = UDim2.new(1, -8, 0, (#Values * 20) + 2);   
+            ]]
+			end;
+
+			function Dropdown:OpenDropdown()
+				ListOuter.Visible = true;
+				Library.OpenedFrames[ListOuter] = true;
+				DropdownArrow.Rotation = 180;
+			end;
+
+			function Dropdown:CloseDropdown()
+				ListOuter.Visible = false;
+				Library.OpenedFrames[ListOuter] = nil;
+				DropdownArrow.Rotation = 0;
+			end;
+
+			function Dropdown:OnChanged(Func)
+				Dropdown.Changed = Func;
+				Func(Dropdown.Value);
+			end;
+
+			function Dropdown:SetValue(Val)
+				if Dropdown.Multi then
+					local nTable = {};
+
+					for Value, Bool in next, Val do
+						if table.find(Dropdown.Values, Value) then
+							nTable[Value] = true
+						end;
+					end;
+
+					Dropdown.Value = nTable;
+				else
+					if (not Val) then
+						Dropdown.Value = nil;
+					elseif table.find(Dropdown.Values, Val) then
+						Dropdown.Value = Val;
+					end;
+				end;
+
+				Dropdown:SetValues();
+				Dropdown:Display();
+
+				Library:SafeCallback(Dropdown.Callback, Dropdown.Value);
+				if Dropdown.Changed then Dropdown.Changed(Dropdown.Value) end
+			end;
+
+
+			DropdownOuter.InputBegan:Connect(function(Input)
+				if Input.UserInputType == Enum.UserInputType.MouseButton1 and not Library:MouseIsOverOpenedFrame() then
+					if ListOuter.Visible then
+						Dropdown:CloseDropdown();
+					else
+						Dropdown:OpenDropdown();
+					end;
+				end;
+			end);
+
+			InputService.InputBegan:Connect(function(Input)
+				if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+					local AbsPos, AbsSize = ListOuter.AbsolutePosition, ListOuter.AbsoluteSize;
+
+					if Mouse.X < AbsPos.X or Mouse.X > AbsPos.X + AbsSize.X
+						or Mouse.Y < (AbsPos.Y - 20 - 1) or Mouse.Y > AbsPos.Y + AbsSize.Y then
+
+						Dropdown:CloseDropdown();
+					end;
+				end;
+			end);
+
+
+			local Defaults = {}
+
+			if type(Info.Default) == 'string' then
+				local Idx = table.find(Dropdown.Values, Info.Default)
+				if Idx then
+					table.insert(Defaults, Idx)
+				end
+			elseif type(Info.Default) == 'table' then
+				for _, Value in next, Info.Default do
+					local Idx = table.find(Dropdown.Values, Value)
+					if Idx then
+						table.insert(Defaults, Idx)
+					end
+				end
+			elseif type(Info.Default) == 'number' and Dropdown.Values[Info.Default] ~= nil then
+				table.insert(Defaults, Info.Default)
+			end
+
+			if next(Defaults) then
+				for i = 1, #Defaults do
+					local Index = Defaults[i]
+					if Info.Multi then
+						Dropdown.Value[Dropdown.Values[Index]] = true
+					else
+						Dropdown.Value = Dropdown.Values[Index];
+					end
+
+					if (not Info.Multi) then break end
+				end
+
+				Dropdown:SetValues();
+				Dropdown:Display();
+			end
+
+			Groupbox:AddBlank(Info.BlankSize or 5);
+			Groupbox:Resize();
+
+			Options[Idx] = Dropdown;
+
+
+			return Dropdown;
+		end;
+    
     function Funcs:AddDropdown(Idx, Info)
         if Info.SpecialType == 'Player' then
             Info.Values = GetPlayersString();
