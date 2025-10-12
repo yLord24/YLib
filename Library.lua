@@ -19,9 +19,13 @@ ScreenGui.Parent = CoreGui;
 
 local Toggles = {};
 local Options = {};
+local Labels = {};
+
+local TotalButtons =  0
 
 getgenv().Toggles = Toggles;
 getgenv().Options = Options;
+getgenv().MiscFunctions = {}
 getgenv().MiscUi = {}
 getgenv().MiscUi["Buttons"] = {}
 
