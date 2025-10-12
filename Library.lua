@@ -153,7 +153,7 @@ function Library:CreateLabel(Properties, IsHud)
     local _Instance = Library:Create('TextLabel', {
         BackgroundTransparency = 1;
         Font = Library.Font;
-        TextColor3 = Library.FontColor;
+        TextColor3 = Properties.TextColor3 or Library.FontColor;
         TextSize = 16;
         TextStrokeTransparency = 0;
     });
@@ -161,7 +161,7 @@ function Library:CreateLabel(Properties, IsHud)
     Library:ApplyTextStroke(_Instance);
 
     Library:AddToRegistry(_Instance, {
-        TextColor3 = 'FontColor';
+        TextColor3 = Properties.TextColor3 or 'FontColor';
     }, IsHud);
 
     return Library:Create(_Instance, Properties);
@@ -3490,6 +3490,7 @@ function Library:CreateWindow(...)
         TextXAlignment = Enum.TextXAlignment.Left;
         ZIndex = 1;
         Parent = Inner;
+        TextColor3 = Color3.fromRGB(188, 15, 99)
     });
 
     local MainSectionOuter = Library:Create('Frame', {
@@ -3550,8 +3551,9 @@ function Library:CreateWindow(...)
         BorderColor3 = 'OutlineColor';
     });
 
-    function Window:SetWindowTitle(Title)
+    function Window:SetWindowTitle(Title, Color)
         WindowLabel.Text = Title;
+        WindowLabel.TextColor3 = Color or Color3.fromRGB(255,255,255)
     end;
 
     function Window:AddTab(Name)
