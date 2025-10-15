@@ -2180,7 +2180,7 @@ do
 				local DropdownLabel = Library:CreateLabel({
 					Size = UDim2.new(1, 0, 0, 10);
 					TextSize = 14;
-					Text = "Pokemon WishList";
+					Text = "Pokemon Wishlist";
 					TextXAlignment = Enum.TextXAlignment.Left;
 					TextYAlignment = Enum.TextYAlignment.Bottom;
 					ZIndex = 5;
@@ -2344,7 +2344,7 @@ do
 
 				local Count = 0;
 
-				for Idx, Value in next, getgenv().WishList do
+				for Idx, Value in next, getgenv().Wishlist do
 
 					local Table = {
 						UpdateButton = nil,
