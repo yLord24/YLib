@@ -1,7 +1,7 @@
 local httpService = game:GetService('HttpService')
 
 local SaveManager = {} do
-	SaveManager.Folder = 'LinoriaLibSettings'
+	SaveManager.Folder = 'YHubLib'
 	SaveManager.Ignore = {}
 	SaveManager.Parser = {
 		Toggle = {
@@ -79,57 +79,68 @@ local SaveManager = {} do
 	end
 
 	function SaveManager:Save(name)
-		if (not name) then
-			return false, 'no config file is selected'
-		end
-
-		local fullPath = self.Folder .. '/settings/' .. name .. '.json'
-
-		local data = {
-			objects = {}
-		}
-
-		for idx, toggle in next, Toggles do
-			if self.Ignore[idx] then continue end
-
-			table.insert(data.objects, self.Parser[toggle.Type].Save(idx, toggle))
-		end
-
-		for idx, option in next, Options do
-			if not self.Parser[option.Type] then continue end
-			if self.Ignore[idx] then continue end
-
-			table.insert(data.objects, self.Parser[option.Type].Save(idx, option))
-		end	
-
-		local success, encoded = pcall(httpService.JSONEncode, httpService, data)
-		if not success then
-			return false, 'failed to encode data'
-		end
-
-		writefile(fullPath, encoded)
-		return true
-	end
-
-	function SaveManager:Load(name)
-		if (not name) then
-			return false, 'no config file is selected'
-		end
-		
-		local file = self.Folder .. '/settings/' .. name .. '.json'
-		if not isfile(file) then return false, 'invalid file' end
-
-		local success, decoded = pcall(httpService.JSONDecode, httpService, readfile(file))
-		if not success then return false, 'decode error' end
-
-		for _, option in next, decoded.objects do
-			if self.Parser[option.type] then
-				task.spawn(function() self.Parser[option.type].Load(option.idx, option) end) -- task.spawn() so the config loading wont get stuck.
+			if (not name) then
+				return false, 'no config file is selected'
 			end
-		end
 
-		return true
+			local fullPath = self.Folder .. '/settings/' .. name .. '.json'
+
+			local data = {
+				objects = {},
+				wishlist = getgenv().Wishlist
+			}
+
+
+			for idx, toggle in next, Toggles do
+				if self.Ignore[idx] then continue end
+
+				table.insert(data.objects, self.Parser[toggle.Type].Save(idx, toggle))
+			end
+
+			for idx, option in next, Options do
+				if not self.Parser[option.Type] then continue end
+				if self.Ignore[idx] then continue end
+
+				table.insert(data.objects, self.Parser[option.Type].Save(idx, option))
+			end	
+
+			local success, encoded = pcall(httpService.JSONEncode, httpService, data)
+			if not success then
+				return false, 'failed to encode data'
+			end
+
+
+			writefile(fullPath, encoded)
+			return true
 	end
+
+		function SaveManager:Load(name, customDirectory)
+			if (not name) then
+				return false, 'no config file is selected'
+			end
+
+			local file = self.Folder .. (customDirectory or '/settings/') .. name .. '.json'
+			warn(file)
+			if not isfile(file) then return false, 'invalid file' end
+
+			local success, decoded = pcall(httpService.JSONDecode, httpService, readfile(file))
+			if not success then return false, 'decode error' end
+
+			if name == "Options" then
+				for _, option in next, decoded.objects do
+					if self.Parser[option.type] then
+						self.Parser[option.type].Load(option.idx, option)
+					end
+				end
+			elseif name == "Pokemons" then 
+for a,b in pairs(decoded.wishlist) do
+print("LETTING YOU NO", a,b)
+end
+				return decoded.wishlist
+			end
+
+			return  true
+		end
 
 	function SaveManager:IgnoreThemeSettings()
 		self:SetIgnoreIndexes({ 
