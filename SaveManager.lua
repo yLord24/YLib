@@ -1,4 +1,4 @@
-local httpService = game:GetService('HttpService')
+	local httpService = game:GetService('HttpService')
 
 local SaveManager = {} do
 	SaveManager.Folder = 'YHubLib'
@@ -87,8 +87,8 @@ local SaveManager = {} do
 
 			local data = {
 				objects = {},
-				wishlist = getgenv().Wishlist
-			    webhook = getgenv().Webhook
+				wishlist = getgenv().Wishlist,
+			    webhook = getgenv().Webhook,
 			}
 
 			for idx, toggle in next, Toggles do
