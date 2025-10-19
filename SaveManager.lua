@@ -120,7 +120,7 @@ local SaveManager = {} do
 			end
 
 			local file = self.Folder .. (customDirectory or '/settings/') .. name .. '.json'
-			warn(file)
+
 			if not isfile(file) then return false, 'invalid file' end
 
 			local success, decoded = pcall(httpService.JSONDecode, httpService, readfile(file))
@@ -133,9 +133,6 @@ local SaveManager = {} do
 					end
 				end
 			elseif name == "Pokemons" then 
-for a,b in pairs(decoded.wishlist) do
-print("LETTING YOU NO", a,b)
-end
 				return decoded.wishlist
 			end
 
