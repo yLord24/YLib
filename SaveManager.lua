@@ -88,8 +88,8 @@ local SaveManager = {} do
 			local data = {
 				objects = {},
 				wishlist = getgenv().Wishlist
+			    webhook = getgenv().Webhook
 			}
-
 
 			for idx, toggle in next, Toggles do
 				if self.Ignore[idx] then continue end
@@ -134,6 +134,8 @@ local SaveManager = {} do
 				end
 			elseif name == "Pokemons" then 
 				return decoded.wishlist
+			elseif name == "Webhook" then 
+				return decoded.webhook
 			end
 
 			return  true
