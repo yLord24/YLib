@@ -2462,7 +2462,7 @@ FoundButton = true
 			return FoundButton
 			end
 
-			getgenv().MiscFunctions["NewDropdownValue"] = function (Idx,Value)
+				function Dropdown:RemoveDropdownValue(Idx,Value)
 
 				local Count = 0;
 
