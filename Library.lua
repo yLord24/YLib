@@ -2428,8 +2428,25 @@ do
 				-- ListOuter.Size = UDim2.new(1, -8, 0, (#Values * 20) + 2);
 			end;
 
-			getgenv().MiscFunctions["RemoveDropdownValue"] = function ()
+			function Dropdown:RemoveDropdownValue(ReferenceValue)
 
+				local IndexCounter = 0
+			local FoundButton = false
+
+	 for ButtonInstance,ButtonTable in next, getgenv().MiscUi["Buttons"] do 
+		IndexCounter = IndexCounter+1
+		if ButtonTable.RealValue == ReferenceValue then
+
+			ButtonTable.ButtonInput:Disconnect()
+
+			getgenv().MiscUi["Buttons"][ButtonInstance] = nil
+			ButtonInstance:Destroy()
+FoundButton = true
+			break
+		end
+	end
+
+			if not FoundButton then return end
 				TotalButtons = TotalButtons - 1
 
 				if TotalButtons > 8 then
@@ -2442,7 +2459,7 @@ do
 					ListOuter.Size = ListOuter.Size - UDim2.new(0,0,0,TotalButtons == 8 and 0.5 or 20);
 				end
 
-
+			return FoundButton
 			end
 
 			getgenv().MiscFunctions["NewDropdownValue"] = function (Idx,Value)
