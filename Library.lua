@@ -2462,7 +2462,7 @@ FoundButton = true
 			return FoundButton
 			end
 
-				function Dropdown:RemoveDropdownValue(Idx,Value)
+				function Dropdown:NewDropdownValue(Idx,Value)
 
 				local Count = 0;
 
