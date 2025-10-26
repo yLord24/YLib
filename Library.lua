@@ -2244,7 +2244,7 @@ do
 				Position = UDim2.new(0, 5, 0, 0);
 				Size = UDim2.new(1, -5, 1, 0);
 				TextSize = 14;
-				Text = 'Pokemons';
+				Text = info.Text or '';
 				TextXAlignment = Enum.TextXAlignment.Left;
 				TextWrapped = true;
 				ZIndex = 7;
@@ -2344,7 +2344,7 @@ do
 
 				local Count = 0;
 
-				for Idx, Value in next, getgenv().Wishlist do
+				for Idx, Value in next, (info.ValueTable or {}) do
 
 					local Table = {
 						UpdateButton = nil,
