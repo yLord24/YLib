@@ -2465,7 +2465,7 @@ FoundButton = true
 				function Dropdown:NewDropdownValue(Idx,Value)
 
 				local Count = 0;
-warn(Idx)
+
 				local Table = {
 					UpdateButton = nil,
 					RealValue = Value,
