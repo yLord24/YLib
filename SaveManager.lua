@@ -1,4 +1,4 @@
-	local httpService = game:GetService('HttpService')
+local httpService = game:GetService('HttpService')
 
 local SaveManager = {} do
 	SaveManager.Folder = 'YHubLib'
@@ -89,6 +89,7 @@ local SaveManager = {} do
 				objects = {},
 				wishlist = getgenv().Wishlist,
 			    webhook = getgenv().Webhook,
+                pokeballs = getgenv().SettedPokeballs
 			}
 
 			for idx, toggle in next, Toggles do
@@ -136,6 +137,8 @@ local SaveManager = {} do
 				return decoded.wishlist
 			elseif name == "Webhook" then 
 				return decoded.webhook
+            elseif name == "Pokeballs" then 
+				return decoded.pokeballs
 			end
 
 			return  true
