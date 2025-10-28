@@ -2344,7 +2344,7 @@ do
 
 				local Count = 0;
 
-				for Idx, Value in next, (Info.ValueTable or {}) do
+				for Idx, Value in next, (Info.ValueTable or Values or {}) do
 
 					local Table = {
 						UpdateButton = nil,
