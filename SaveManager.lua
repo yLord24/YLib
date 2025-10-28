@@ -1,7 +1,7 @@
 local httpService = game:GetService('HttpService')
 
 local SaveManager = {} do
-	SaveManager.Folder = 'YHubLib'
+	SaveManager.Folder = getgenv().Folder or 'YHubLib'
 	SaveManager.Ignore = {}
 	SaveManager.Parser = {
 		Toggle = {
